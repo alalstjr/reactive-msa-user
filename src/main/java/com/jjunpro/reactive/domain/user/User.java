@@ -1,34 +1,22 @@
 package com.jjunpro.reactive.domain.user;
 
+import com.jjunpro.reactive.domain.configs.Base;
+import com.jjunpro.reactive.domain.user.dto.UserDto;
 import javax.management.relation.Role;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
+import org.springframework.beans.BeanUtils;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Builder
 @EqualsAndHashCode
-@NoArgsConstructor
-@AllArgsConstructor
 @Document(collection = "users")
-public class User {
+public class User extends Base {
 
-    @Id
-    String id;
     String username;
+    String nickname;
+    String email;
+    String phone;
     String password;
     Role   role;
-    String teamId;
-
-    public User withTeamId(String newTeamId) {
-        return User.builder()
-                   .id(id)
-                   .username(username)
-                   .password(password)
-                   .role(role)
-                   .teamId(newTeamId)
-                   .build();
-    }
 }
