@@ -23,14 +23,14 @@ public class Routing {
                                   path("/teams"),
                                   RouterFunctions.route(GET("/{name}").and(accept(MediaType.APPLICATION_JSON)), teamHandlers::findByName)
                                                  .andRoute(GET("/id/{id}").and(accept(MediaType.APPLICATION_JSON)), teamHandlers::findById)
-                                                 .andRoute(POST("/").and(accept(MediaType.APPLICATION_JSON)), teamHandlers::addTeam)
+                                                 .andRoute(POST("").and(accept(MediaType.APPLICATION_JSON)), teamHandlers::addTeam)
                                                  .andRoute(DELETE("/{id}").and(accept(MediaType.APPLICATION_JSON)), teamHandlers::deleteTeam)
                               )
                               .andNest(
                                     path("/users"),
                                     RouterFunctions.route(GET("/id/{id}").and(accept(MediaType.APPLICATION_JSON)), userHandlers::findById)
                                                    .andRoute(GET("/{username}").and(accept(MediaType.APPLICATION_JSON)), userHandlers::findByUsername)
-                                                   .andRoute(POST("/").and(accept(MediaType.APPLICATION_JSON)), userHandlers::createUser)
+                                                   .andRoute(POST("").and(accept(MediaType.APPLICATION_JSON)), userHandlers::createUser)
                                                    .andRoute(DELETE("/{id}").and(accept(MediaType.APPLICATION_JSON)), userHandlers::deleteUser)
                               );
     }
