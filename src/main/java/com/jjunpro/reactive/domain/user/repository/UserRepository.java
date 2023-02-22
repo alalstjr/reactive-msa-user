@@ -8,9 +8,8 @@ import reactor.core.publisher.Mono;
 
 public interface UserRepository extends CrudRepository<User, String> {
 
+    Flux<User> findByTeamId(String teamId);
     Mono<User> findByUsername(String username);
-
-    Flux<User> savaAll(List<User> users);
-
+    Flux<User> saveAll(List<User> users);
     Mono<Void> deleteAll(List<User> users);
 }
