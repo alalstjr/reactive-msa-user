@@ -1,7 +1,7 @@
 package com.jjunpro.reactive.domain.user.dto;
 
 import com.jjunpro.reactive.domain.user.User;
-import javax.management.relation.Role;
+import com.jjunpro.reactive.domain.user.type.Role;
 
 public record GetUserDto(String id, String username, String password, Role role, String teamId) {
 

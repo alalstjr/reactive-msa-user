@@ -2,9 +2,9 @@ package com.jjunpro.reactive.domain.user;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.jjunpro.reactive.domain.user.dto.GetUserDto;
+import com.jjunpro.reactive.domain.user.type.Role;
 import com.jjunpro.reactive.infrastructure.persistence.entity.UserEntity;
 import java.time.LocalDateTime;
-import javax.management.relation.Role;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import org.springframework.data.annotation.CreatedDate;

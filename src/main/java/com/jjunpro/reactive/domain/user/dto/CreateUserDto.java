@@ -1,7 +1,7 @@
 package com.jjunpro.reactive.domain.user.dto;
 
 import com.jjunpro.reactive.domain.user.User;
-import javax.management.relation.Role;
+import com.jjunpro.reactive.domain.user.type.Role;
 
 public record CreateUserDto(String username, String password, String passwordConfirmation, Role role, String teamName) {
     public User toUser() {
