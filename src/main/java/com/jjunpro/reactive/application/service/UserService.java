@@ -11,6 +11,7 @@ import com.jjunpro.reactive.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -20,6 +21,11 @@ public class UserService {
 
     private final TeamRepository teamRepository;
     private final UserRepository userRepository;
+
+    public Flux<GetUserDto> findAllUsers() {
+        return userRepository.findAll()
+                             .flatMap(user -> Flux.just(user.toGetUserDto()));
+    }
 
     public Mono<GetUserDto> findById(String userId) {
         return userRepository.findById(userId)
@@ -37,6 +43,9 @@ public class UserService {
         return createUserDtoMono
             .flatMap(createUserDto -> userRepository
                 .findByUsername(createUserDto.username())
+                .doOnEach(
+                    user -> log.info("회원 [" + createUserDto.username() + "] 을 추가 시도합니다.")
+                )
                 .hasElement()
                 .flatMap(isUserPresent -> isUserPresent
                     ?

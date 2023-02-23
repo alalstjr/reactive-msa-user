@@ -46,7 +46,7 @@ public class TeamService {
                 createTeamDto ->
                     teamRepository.findByName(createTeamDto.name())
                         .doOnEach(
-                            team -> log.error("Team with name " + createTeamDto.name() + " already exists")
+                            team -> log.info("팀 [" + createTeamDto.name() + "] 을 추가 시도합니다.")
                         )
                         .map(Team::toGetTeamDto)
                         .switchIfEmpty(
