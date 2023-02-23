@@ -42,16 +42,24 @@ public class TeamService {
     public Mono<GetTeamDto> addTeam(Mono<CreateTeamDto> createTeamDtoMono) {
 
         return createTeamDtoMono
-            .flatMap(createTeamDto -> teamRepository.findByName(createTeamDto.name())
-                                                    .doOnEach(team -> log.error("Team with name " + createTeamDto.name() + " already exists"))
-                                                    .map(Team::toGetTeamDto)
-                                                    .switchIfEmpty(Mono.defer(() -> createTeamWithMembers(createTeamDto))));
+            .flatMap(
+                createTeamDto ->
+                    teamRepository.findByName(createTeamDto.name())
+                        .doOnEach(
+                            team -> log.error("Team with name " + createTeamDto.name() + " already exists")
+                        )
+                        .map(Team::toGetTeamDto)
+                        .switchIfEmpty(
+                            Mono.defer(
+                                () -> createTeamWithMembers(createTeamDto)
+                            )
+                        )
+            );
     }
 
     private Mono<GetTeamDto> createTeamWithMembers(CreateTeamDto createTeamDto) {
 
-        // at first team is inserted into db and all its member are updated with the new teamId
-
+        // 처음에는 팀이 db에 삽입되고 모든 구성원이 새 teamId로 업데이트됩니다.
         return teamRepository
             .save(createTeamDto.toTeam())
             .flatMap(insertedTeam -> {
@@ -62,8 +70,7 @@ public class TeamService {
                         TeamUtils.toId.apply(insertedTeam)))
                     .toList();
 
-                // then all members with correct teamId are saved into db, flux is converted to list which is used to update team's members. At the end updated team is saved in db.
-
+                // 그런 다음 올바른 teamId를 가진 모든 구성원이 db에 저장되고 플럭스는 팀 구성원을 업데이트하는 데 사용되는 목록으로 변환됩니다. 마지막으로 업데이트된 팀은 db에 저장됩니다.
                 return userRepository
                     .saveAll(membersToInsert)
                     .collectList()
