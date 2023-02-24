@@ -1,5 +1,6 @@
-package com.jjunpro.reactive.web.config;
+package com.jjunpro.reactive.web.error;
 
+import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -16,8 +17,11 @@ public class ObjectValidator {
         if (errors.isEmpty()) {
             return object;
         } else {
-            String errorDetails = errors.stream().map(er -> er.getMessage()).collect(
-                Collectors.joining(", "));
+            String errorDetails = errors
+                .stream()
+                .map(ConstraintViolation::getMessage)
+                .collect(Collectors.joining(", "));
+
             throw new ObjectValidationException(errorDetails);
         }
     }

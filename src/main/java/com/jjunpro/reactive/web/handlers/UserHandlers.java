@@ -4,7 +4,7 @@ import com.jjunpro.reactive.application.service.UserService;
 import com.jjunpro.reactive.domain.team.dto.GetTeamDto;
 import com.jjunpro.reactive.domain.user.dto.CreateUserDto;
 import com.jjunpro.reactive.web.config.GlobalRoutingHandler;
-import com.jjunpro.reactive.web.config.ObjectValidator;
+import com.jjunpro.reactive.web.error.ObjectValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -20,6 +20,7 @@ public class UserHandlers {
     private final ObjectValidator validator;
 
     public Mono<ServerResponse> findAllUsers(ServerRequest serverRequest) {
+        serverRequest.headers();
         return ServerResponse
             .status(HttpStatus.OK)
             .contentType(MediaType.APPLICATION_JSON)
