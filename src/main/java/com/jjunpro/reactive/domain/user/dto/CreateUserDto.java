@@ -38,6 +38,7 @@ public record CreateUserDto(
                    .nickname(nickname)
                    .password(password)
                    .role(role)
+                   .createdDate(LocalDateTime.now())
                    .build();
     }
 }
