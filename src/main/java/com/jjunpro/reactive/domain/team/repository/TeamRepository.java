@@ -1,6 +1,6 @@
 package com.jjunpro.reactive.domain.team.repository;
 
-import com.jjunpro.reactive.domain.configs.repository.CrudRepository;
+import com.jjunpro.reactive.domain.config.repository.CrudRepository;
 import com.jjunpro.reactive.domain.team.Team;
 import reactor.core.publisher.Mono;
 

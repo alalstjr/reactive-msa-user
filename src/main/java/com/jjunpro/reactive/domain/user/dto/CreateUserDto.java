@@ -5,6 +5,7 @@ import com.jjunpro.reactive.domain.user.type.Role;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDateTime;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 public record CreateUserDto(
 
@@ -31,14 +32,16 @@ public record CreateUserDto(
     LocalDateTime modifiedDate,
     String teamName
 ) {
+    public User toUser(PasswordEncoder passwordEncoder) {
+        String encodedPassword = passwordEncoder.encode(password);
 
-    public User toUser() {
-        return User.builder()
-                   .username(username)
-                   .nickname(nickname)
-                   .password(password)
-                   .role(role)
-                   .createdDate(LocalDateTime.now())
-                   .build();
+        return User
+                .builder()
+                .username(username)
+                .nickname(nickname)
+                .password(encodedPassword)
+                .role(role)
+                .createdDate(LocalDateTime.now())
+                .build();
     }
 }

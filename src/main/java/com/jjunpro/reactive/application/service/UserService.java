@@ -11,13 +11,13 @@ import com.jjunpro.reactive.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
  * 사용자 서비스
- *
  * @author jjunpro
  * @since 2023/02/25 AM 12:45
  */
@@ -26,8 +26,9 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class UserService {
 
-    private final TeamRepository teamRepository;
-    private final UserRepository userRepository;
+    private final TeamRepository  teamRepository;
+    private final UserRepository  userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     /**
      * 사용자 정보를 모두 탐색
@@ -72,27 +73,37 @@ public class UserService {
 
         return createUserDtoMono
             .flatMap(createUserDto -> {
-                Mono<Boolean> usernameExistsMono = checkIfUsernameExists(createUserDto.username());
-                Mono<Boolean> nicknameExistsMono = checkIfNicknameExists(createUserDto.nickname());
+                Mono<Boolean> usernameExistsMono       = checkIfUsernameExists(createUserDto.username());
+                Mono<Boolean> nicknameExistsMono       = checkIfNicknameExists(createUserDto.nickname());
+                Mono<Boolean> passwordConfirmationMono = checkIfPasswordConfirmation(
+                    createUserDto.password(), createUserDto.passwordConfirmation()
+                );
 
                 /* 유효성 검사를 실시합니다. */
-                return Mono.zip(usernameExistsMono, nicknameExistsMono)
+                return Mono.zip(usernameExistsMono, nicknameExistsMono, passwordConfirmationMono)
                            .doOnEach(
                                user -> log.info("회원 [" + createUserDto.username() + "] 을 추가 시도합니다.")
                            )
                            .flatMap(zip -> {
-                               Boolean usernameExists = zip.getT1();
-                               Boolean nicknameExists = zip.getT2();
+                               Boolean usernameExists       = zip.getT1();
+                               Boolean nicknameExists       = zip.getT2();
+                               Boolean passwordConfirmation = zip.getT3();
 
                                if (Boolean.TRUE.equals(usernameExists)) {
                                    return Mono.error(
-                                       new UserServiceException(HttpStatus.UNPROCESSABLE_ENTITY, "Username already exists")
+                                       new UserServiceException(HttpStatus.UNPROCESSABLE_ENTITY, "아이디가 이미 존재합니다.")
                                    );
                                }
 
                                if (Boolean.TRUE.equals(nicknameExists)) {
                                    return Mono.error(
-                                       new UserServiceException(HttpStatus.UNPROCESSABLE_ENTITY, "Nickname already exists")
+                                       new UserServiceException(HttpStatus.UNPROCESSABLE_ENTITY, "닉네임이 이미 존재합니다.")
+                                   );
+                               }
+
+                               if (Boolean.FALSE.equals(passwordConfirmation)) {
+                                   return Mono.error(
+                                       new UserServiceException(HttpStatus.UNPROCESSABLE_ENTITY, "비밀번호가 일치하지 않습니다.")
                                    );
                                }
 
@@ -161,12 +172,24 @@ public class UserService {
     }
 
     /**
+     * 비밀번호 일치여부 유효성 검사
+     * @param password
+     * @param passwordConfirmation
+     * @return
+     */
+    private Mono<Boolean> checkIfPasswordConfirmation(
+        String password, String passwordConfirmation
+    ) {
+        return Mono.just(password.equals(passwordConfirmation));
+    }
+
+    /**
      * 사용자 정보를 생성합니다.
      * @param createUserDto
      * @return
      */
     private Mono<GetUserDto> createUser(CreateUserDto createUserDto) {
-        var user = createUserDto.toUser();
+        var user = createUserDto.toUser(passwordEncoder);
         return userRepository
             .save(user)
             .map(User::toGetUserDto);
