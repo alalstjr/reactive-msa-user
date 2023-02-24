@@ -12,7 +12,9 @@ public record CreateUserDto(
     String passwordConfirmation,
     String nickname,
     String email,
-    @NotNull @Size(min = 2, max = 14) String phone,
+    @NotNull(message = "핸드폰번호는 필수로 입력해야합니다.")
+    @Size(min = 2, max = 14)
+    String phone,
     Role role,
     LocalDateTime createdDate,
     LocalDateTime modifiedDate,
