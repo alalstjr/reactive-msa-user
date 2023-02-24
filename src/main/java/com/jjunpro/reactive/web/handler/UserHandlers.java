@@ -1,4 +1,4 @@
-package com.jjunpro.reactive.web.handlers;
+package com.jjunpro.reactive.web.handler;
 
 import com.jjunpro.reactive.application.service.UserService;
 import com.jjunpro.reactive.domain.team.dto.GetTeamDto;

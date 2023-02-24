@@ -10,4 +10,6 @@ public interface UserDao extends ReactiveMongoRepository<UserEntity, String> {
     Flux<UserEntity> findByTeamId(String teamId);
 
     Mono<UserEntity> findByUsername(String username);
+
+    Mono<UserEntity> findByNickname(String email);
 }

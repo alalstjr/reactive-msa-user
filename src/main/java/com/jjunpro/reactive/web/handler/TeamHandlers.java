@@ -1,4 +1,4 @@
-package com.jjunpro.reactive.web.handlers;
+package com.jjunpro.reactive.web.handler;
 
 import com.jjunpro.reactive.application.service.TeamService;
 import com.jjunpro.reactive.domain.team.dto.CreateTeamDto;
@@ -18,6 +18,7 @@ public class TeamHandlers {
     private final TeamService teamService;
 
     public Mono<ServerResponse> findAllTeams(ServerRequest serverRequest) {
+        serverRequest.headers();
         return ServerResponse
             .status(HttpStatus.OK)
             .contentType(MediaType.APPLICATION_JSON)

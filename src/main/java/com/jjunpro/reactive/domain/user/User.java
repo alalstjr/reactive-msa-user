@@ -51,6 +51,6 @@ public class User {
     }
 
     public GetUserDto toGetUserDto() {
-        return new GetUserDto(id, username, password, role, teamId);
+        return new GetUserDto(id, username, nickname, password, role, teamId);
     }
 }

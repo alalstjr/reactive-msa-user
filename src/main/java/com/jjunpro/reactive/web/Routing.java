@@ -6,8 +6,8 @@ import static org.springframework.web.reactive.function.server.RequestPredicates
 import static org.springframework.web.reactive.function.server.RequestPredicates.accept;
 import static org.springframework.web.reactive.function.server.RequestPredicates.path;
 
-import com.jjunpro.reactive.web.handlers.TeamHandlers;
-import com.jjunpro.reactive.web.handlers.UserHandlers;
+import com.jjunpro.reactive.web.handler.TeamHandlers;
+import com.jjunpro.reactive.web.handler.UserHandlers;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
