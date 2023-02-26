@@ -25,3 +25,12 @@ spring:
       username: root
       password: root
 
+# Security
+springbootjjwt:
+  password:
+    secret: mysecret
+    iteration: 33
+    keylength: 256
+  jjwt:
+    secret: ThisIsSecretForJWTHS512SignatureAlgorithmThatMUSTHave64ByteLength
+    expiration: 28800

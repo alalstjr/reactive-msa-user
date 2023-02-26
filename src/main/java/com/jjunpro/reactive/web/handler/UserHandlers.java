@@ -3,6 +3,7 @@ package com.jjunpro.reactive.web.handler;
 import com.jjunpro.reactive.application.service.UserService;
 import com.jjunpro.reactive.domain.team.dto.GetTeamDto;
 import com.jjunpro.reactive.domain.user.dto.CreateUserDto;
+import com.jjunpro.reactive.domain.user.dto.LoginUserDto;
 import com.jjunpro.reactive.web.config.GlobalRoutingHandler;
 import com.jjunpro.reactive.web.error.ObjectValidator;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,7 @@ import reactor.core.publisher.Mono;
 @Component
 @RequiredArgsConstructor
 public class UserHandlers {
+
     private final UserService     userService;
     private final ObjectValidator validator;
 
@@ -45,5 +47,10 @@ public class UserHandlers {
     public Mono<ServerResponse> deleteUser(ServerRequest serverRequest) {
         var userId = serverRequest.pathVariable("id");
         return GlobalRoutingHandler.doRequest(userService.deleteUser(userId), HttpStatus.OK);
+    }
+
+    public Mono<ServerResponse> login(ServerRequest serverRequest) {
+        var loginUserDtoMono = serverRequest.bodyToMono(LoginUserDto.class).doOnNext(validator::validate);
+        return GlobalRoutingHandler.doRequest(userService.login(loginUserDtoMono), HttpStatus.CREATED);
     }
 }

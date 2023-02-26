@@ -1,9 +1,10 @@
 package com.jjunpro.reactive.domain.user;
 
 import com.jjunpro.reactive.domain.user.dto.GetUserDto;
-import com.jjunpro.reactive.domain.user.type.Role;
+import com.jjunpro.reactive.domain.user.type.UserRole;
 import com.jjunpro.reactive.infrastructure.persistence.entity.UserEntity;
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 
@@ -11,16 +12,17 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode
 public class User {
 
-    String        id;
-    String        username;
-    String        password;
-    String        nickname;
-    String        email;
-    String        phone;
-    Role          role;
-    String        teamId;
-    LocalDateTime createdDate;
-    LocalDateTime modifiedDate;
+    String         id;
+    String         username;
+    String         password;
+    String         nickname;
+    String         email;
+    String         phone;
+    List<UserRole> userRoles;
+    String         teamId;
+    Boolean        enabled;
+    LocalDateTime  createdDate;
+    LocalDateTime  modifiedDate;
 
     public User withTeamId(String newTeamId) {
         return User
@@ -29,7 +31,7 @@ public class User {
             .email(email)
             .nickname(nickname)
             .password(password)
-            .role(role)
+            .userRoles(userRoles)
             .teamId(newTeamId)
             .build();
     }
@@ -43,7 +45,7 @@ public class User {
             .nickname(nickname)
             .email(email)
             .phone(phone)
-            .role(role)
+            .userRoles(userRoles)
             .teamId(teamId)
             .createdDate(createdDate)
             .modifiedDate(modifiedDate)
@@ -51,6 +53,6 @@ public class User {
     }
 
     public GetUserDto toGetUserDto() {
-        return new GetUserDto(id, username, nickname, password, role, teamId, createdDate);
+        return new GetUserDto(id, username, nickname, password, userRoles, teamId, createdDate);
     }
 }

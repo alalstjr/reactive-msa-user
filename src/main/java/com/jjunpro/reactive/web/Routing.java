@@ -38,6 +38,11 @@ public class Routing {
                     .andRoute(GET("/id/{id}").and(accept(MediaType.APPLICATION_JSON)), teamHandlers::findById)
                     .andRoute(POST("").and(accept(MediaType.APPLICATION_JSON)), teamHandlers::addTeam)
                     .andRoute(DELETE("/{id}").and(accept(MediaType.APPLICATION_JSON)), teamHandlers::deleteTeam)
+            )
+            .andNest(
+                path("/login"),
+                RouterFunctions
+                    .route(POST("").and(accept(MediaType.APPLICATION_JSON)), userHandlers::login)
             );
     }
 }

@@ -7,7 +7,9 @@ import com.jjunpro.reactive.domain.user.User;
 import com.jjunpro.reactive.domain.user.UserUtils;
 import com.jjunpro.reactive.domain.user.dto.CreateUserDto;
 import com.jjunpro.reactive.domain.user.dto.GetUserDto;
+import com.jjunpro.reactive.domain.user.dto.LoginUserDto;
 import com.jjunpro.reactive.domain.user.repository.UserRepository;
+import com.jjunpro.reactive.web.security.util.JWTUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -29,6 +31,7 @@ public class UserService {
     private final TeamRepository  teamRepository;
     private final UserRepository  userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JWTUtil         jwtUtil;
 
     /**
      * 사용자 정보를 모두 탐색
@@ -193,5 +196,18 @@ public class UserService {
         return userRepository
             .save(user)
             .map(User::toGetUserDto);
+    }
+
+    public Mono<String> login(Mono<LoginUserDto> loginUserDtoMono) {
+        return loginUserDtoMono.flatMap(
+            loginUserDto ->
+                this.userRepository
+                    .findByUsername(loginUserDto.username())
+                    .map(User::toGetUserDto)
+                    .filter(userDto -> passwordEncoder.matches(loginUserDto.password(), userDto.password()))
+                    .map(jwtUtil::generateToken)
+                    .switchIfEmpty(Mono.error(new UserServiceException(HttpStatus.UNAUTHORIZED, "로그인 정보가 옳바르지 않습니다.")))
+                    .log()
+        );
     }
 }

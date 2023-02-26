@@ -1,10 +1,11 @@
 package com.jjunpro.reactive.domain.user.dto;
 
 import com.jjunpro.reactive.domain.user.User;
-import com.jjunpro.reactive.domain.user.type.Role;
+import com.jjunpro.reactive.domain.user.type.UserRole;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDateTime;
+import java.util.List;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 public record CreateUserDto(
@@ -27,7 +28,6 @@ public record CreateUserDto(
 
     String email,
     String phone,
-    Role role,
     LocalDateTime createdDate,
     LocalDateTime modifiedDate,
     String teamName
@@ -40,7 +40,7 @@ public record CreateUserDto(
                 .username(username)
                 .nickname(nickname)
                 .password(encodedPassword)
-                .role(role)
+                .userRoles(List.of(UserRole.USER))
                 .createdDate(LocalDateTime.now())
                 .build();
     }
