@@ -12,6 +12,11 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+/**
+ * JWToken 전체적인 설정 정보
+ * @author jjunpro
+ * @since 2023/02/26 PM 15:33
+ */
 @Component
 public class JWTUtil {
 
@@ -54,19 +59,19 @@ public class JWTUtil {
     private String doGenerateToken(Map<String, Object> claims, String username) {
         long       expirationTimeLong = Long.parseLong(expirationTime); //in second
         final Date createdDate        = new Date();
-        final Date expirationDate = new Date(createdDate.getTime() + expirationTimeLong * 1000);
+        final Date expirationDate     = new Date(createdDate.getTime() + expirationTimeLong * 1000);
 
-        return Jwts.builder()
-                   .setClaims(claims)
-                   .setSubject(username)
-                   .setIssuedAt(createdDate)
-                   .setExpiration(expirationDate)
-                   .signWith(key)
-                   .compact();
+        return Jwts
+            .builder()
+            .setClaims(claims)
+            .setSubject(username)
+            .setIssuedAt(createdDate)
+            .setExpiration(expirationDate)
+            .signWith(key)
+            .compact();
     }
 
     public Boolean validateToken(String token) {
         return !isTokenExpired(token);
     }
-
 }

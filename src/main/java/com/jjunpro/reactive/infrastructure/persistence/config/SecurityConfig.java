@@ -14,6 +14,11 @@ import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import reactor.core.publisher.Mono;
 
+/**
+ * Spring Security 6 설정 접근권한과 JWToken 설정이 되어있음
+ * @author jjunpro
+ * @since 2023/02/26 PM 15:33
+ */
 @Configuration
 @EnableWebFluxSecurity
 @RequiredArgsConstructor
@@ -28,11 +33,11 @@ public class SecurityConfig {
         return http
             .csrf().disable()
             .exceptionHandling()
-            .authenticationEntryPoint((swe, e) ->
-                                          Mono.fromRunnable(() -> swe.getResponse().setStatusCode(
-                                              HttpStatus.UNAUTHORIZED))
-            ).accessDeniedHandler((swe, e) ->
-                                      Mono.fromRunnable(() -> swe.getResponse().setStatusCode(HttpStatus.FORBIDDEN))
+            .authenticationEntryPoint(
+                (swe, e) -> Mono.fromRunnable(() -> swe.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED))
+            )
+            .accessDeniedHandler(
+                (swe, e) -> Mono.fromRunnable(() -> swe.getResponse().setStatusCode(HttpStatus.FORBIDDEN))
             )
             .and()
             .formLogin().disable()

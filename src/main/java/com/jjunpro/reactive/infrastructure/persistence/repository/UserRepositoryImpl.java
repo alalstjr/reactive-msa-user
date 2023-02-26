@@ -10,6 +10,11 @@ import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+/**
+ * 회원 정보를 DB 에 직접 연결해서 가져오는 저장소
+ * @author jjunpro
+ * @since 2023/02/26 PM 15:33
+ */
 @Repository
 @RequiredArgsConstructor
 public class UserRepositoryImpl implements UserRepository {
@@ -18,43 +23,50 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public Flux<User> findAll() {
-        return userDao.findAll()
-                      .flatMap(user -> Mono.just(user.toUser()));
+        return userDao
+            .findAll()
+            .flatMap(user -> Mono.just(user.toUser()));
     }
 
     @Override
     public Flux<User> findAllById(List<String> ids) {
-        return userDao.findAllById(ids)
-                      .flatMap(user -> Mono.just(user.toUser()));
+        return userDao
+            .findAllById(ids)
+            .flatMap(user -> Mono.just(user.toUser()));
     }
 
     @Override
     public Mono<User> findById(String id) {
-        return userDao.findById(id)
-                      .flatMap(user -> Mono.just(user.toUser()));
+        return userDao
+            .findById(id)
+            .flatMap(user -> Mono.just(user.toUser()));
     }
 
     @Override
     public Mono<User> save(User user) {
-        return userDao.save(user.toEntity())
-                      .flatMap(userEntity -> Mono.just(userEntity.toUser()));
+        return userDao
+            .save(user.toEntity())
+            .flatMap(userEntity -> Mono.just(userEntity.toUser()));
     }
 
 
     public Flux<User> findByTeamId(String teamId) {
-        return userDao.findByTeamId(teamId)
-                      .flatMap(user -> Mono.just(user.toUser()));
+        return userDao
+            .findByTeamId(teamId)
+            .flatMap(user -> Mono.just(user.toUser()));
     }
 
     @Override
     public Mono<User> findByUsername(String username) {
-        return userDao.findByUsername(username)
-                      .flatMap(user -> Mono.just(user.toUser()));
+        return userDao
+            .findByUsername(username)
+            .flatMap(user -> Mono.just(user.toUser()));
     }
 
     @Override
     public Mono<User> findByNickname(String nickname) {
-        return userDao.findByNickname(nickname)
+        return userDao
+            .findByNickname(nickname)
             .flatMap(user -> Mono.just(user.toUser()));
     }
 
@@ -67,11 +79,12 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public Mono<User> delete(String id) {
-
-        return userDao.findById(id)
-                      .flatMap(userEntity -> userDao.delete(userEntity)
-                                                    .then(Mono.just(userEntity.toUser())))
-                      .switchIfEmpty(Mono.error(new PersistenceException("cannot find user to delete")));
+        return userDao
+            .findById(id)
+            .flatMap(
+                userEntity -> userDao.delete(userEntity).then(Mono.just(userEntity.toUser()))
+            )
+            .switchIfEmpty(Mono.error(new PersistenceException("cannot find user to delete")));
     }
 
     @Override

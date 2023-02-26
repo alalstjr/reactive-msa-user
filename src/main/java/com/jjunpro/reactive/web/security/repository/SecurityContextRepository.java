@@ -12,8 +12,13 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
-@AllArgsConstructor
+/**
+ * 토큰을 가져오기 위한 SecurityContextRepository 구현을 만들고 ServerSecurityContextRepository 에 전달합니다.
+ * @author jjunpro
+ * @since 2023/02/26 PM 15:33
+ */
 @Component
+@AllArgsConstructor
 public class SecurityContextRepository implements ServerSecurityContextRepository {
 
     private AuthenticationManager authenticationManager;
@@ -25,12 +30,15 @@ public class SecurityContextRepository implements ServerSecurityContextRepositor
 
     @Override
     public Mono<SecurityContext> load(ServerWebExchange swe) {
-        return Mono.justOrEmpty(swe.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION))
-                   .filter(authHeader -> authHeader.startsWith("Bearer "))
-                   .flatMap(authHeader -> {
-                       String         authToken = authHeader.substring(7);
-                       Authentication auth      = new UsernamePasswordAuthenticationToken(authToken, authToken);
-                       return this.authenticationManager.authenticate(auth).map(SecurityContextImpl::new);
-                   });
+        return Mono
+            .justOrEmpty(swe.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION))
+            .filter(authHeader -> authHeader.startsWith("Bearer "))
+            .flatMap(
+               authHeader -> {
+                   String         authToken = authHeader.substring(7);
+                   Authentication auth      = new UsernamePasswordAuthenticationToken(authToken, authToken);
+                   return this.authenticationManager.authenticate(auth).map(SecurityContextImpl::new);
+               }
+            );
     }
 }

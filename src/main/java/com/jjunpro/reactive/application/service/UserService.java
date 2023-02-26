@@ -198,6 +198,11 @@ public class UserService {
             .map(User::toGetUserDto);
     }
 
+    /**
+     * 로그인 서비스
+     * @param loginUserDtoMono
+     * @return
+     */
     public Mono<String> login(Mono<LoginUserDto> loginUserDtoMono) {
         return loginUserDtoMono.flatMap(
             loginUserDto ->

@@ -11,6 +11,11 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
+/**
+ * 토큰 및 역할 유효성 검사를 위한 구현체
+ * @author jjunpro
+ * @since 2023/02/26 PM 15:33
+ */
 @Component
 @AllArgsConstructor
 public class AuthenticationManager implements ReactiveAuthenticationManager {
@@ -23,17 +28,20 @@ public class AuthenticationManager implements ReactiveAuthenticationManager {
         String authToken = authentication.getCredentials().toString();
         String username = jwtUtil.getUsernameFromToken(authToken);
 
-        return Mono.just(jwtUtil.validateToken(authToken))
-                   .filter(valid -> valid)
-                   .switchIfEmpty(Mono.empty())
-                   .map(valid -> {
-                       Claims       claims   = jwtUtil.getAllClaimsFromToken(authToken);
-                       List<String> rolesMap = claims.get("role", List.class);
-                       return new UsernamePasswordAuthenticationToken(
-                           username,
-                           null,
-                           rolesMap.stream().map(SimpleGrantedAuthority::new).toList()
-                       );
-                   });
+        return Mono
+            .just(jwtUtil.validateToken(authToken))
+            .filter(valid -> valid)
+            .switchIfEmpty(Mono.empty())
+            .map(
+                valid -> {
+                    Claims       claims   = jwtUtil.getAllClaimsFromToken(authToken);
+                    List<String> rolesMap = claims.get("role", List.class);
+                    return new UsernamePasswordAuthenticationToken(
+                        username,
+                        null,
+                        rolesMap.stream().map(SimpleGrantedAuthority::new).toList()
+                    );
+                }
+            );
     }
 }
