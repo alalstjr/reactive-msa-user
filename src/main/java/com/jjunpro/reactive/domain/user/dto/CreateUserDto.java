@@ -40,7 +40,7 @@ public record CreateUserDto(
                 .username(username)
                 .nickname(nickname)
                 .password(encodedPassword)
-                .userRoles(List.of(UserRole.USER))
+                .userRoles(List.of(UserRole.ROLE_USER))
                 .createdDate(LocalDateTime.now())
                 .build();
     }

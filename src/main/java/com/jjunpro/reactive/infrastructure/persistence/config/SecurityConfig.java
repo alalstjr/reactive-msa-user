@@ -1,5 +1,6 @@
 package com.jjunpro.reactive.infrastructure.persistence.config;
 
+import com.jjunpro.reactive.domain.user.type.UserRole;
 import com.jjunpro.reactive.web.security.manager.AuthenticationManager;
 import com.jjunpro.reactive.web.security.repository.SecurityContextRepository;
 import lombok.RequiredArgsConstructor;
@@ -40,12 +41,13 @@ public class SecurityConfig {
             .securityContextRepository(securityContextRepository)
             .authorizeExchange()
             // 로그인 없이 접근 가능한 경로 설정
-            .pathMatchers(HttpMethod.DELETE, "/users/**").permitAll()
             .pathMatchers(HttpMethod.OPTIONS).permitAll()
             .pathMatchers("/login").permitAll()
             // 로그인이 필요한 경로 설정
             .pathMatchers(HttpMethod.GET, "/users").authenticated()
             .pathMatchers(HttpMethod.POST, "/users").authenticated()
+            // 권한이 필요한 경로 설정
+            .pathMatchers(HttpMethod.DELETE, "/users/**").hasRole(UserRole.ROLE_USER.getValue())
             .anyExchange().authenticated()
             .and()
             .build();

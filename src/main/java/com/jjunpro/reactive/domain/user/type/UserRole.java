@@ -3,10 +3,10 @@ package com.jjunpro.reactive.domain.user.type;
 import com.jjunpro.reactive.domain.config.type.EnumModel;
 
 public enum UserRole implements EnumModel {
-    ADMIN("ROLE_ADMIN"),
-    USER("ROLE_USER"),
-    CLIENT("ROLE_CLIENT"),
-    GUEST("ROLE_GUEST");
+    ROLE_ADMIN("ADMIN"),
+    ROLE_USER("USER"),
+    ROLE_CLIENT("CLIENT"),
+    ROLE_GUEST("GUEST");
 
     private final String roleUser;
 
