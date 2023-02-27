@@ -13,8 +13,8 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-@Service
 @Slf4j
+@Service
 @RequiredArgsConstructor
 public class TeamService {
 
@@ -22,21 +22,23 @@ public class TeamService {
     private final UserRepository userRepository;
 
     public Flux<GetTeamDto> findAllTeams() {
-        return teamRepository.findAll()
-                             .flatMap(team -> Flux.just(team.toGetTeamDto()));
+        return teamRepository
+            .findAll()
+            .flatMap(team -> Flux.just(team.toGetTeamDto()));
     }
 
     public Mono<GetTeamDto> findById(String teamId) {
-        return teamRepository.findById(teamId)
-                             .map(Team::toGetTeamDto)
-                             .switchIfEmpty(
-                                 Mono.error(new TeamServiceException("Team with given id doesn't exist")));
+        return teamRepository
+            .findById(teamId)
+            .map(Team::toGetTeamDto)
+            .switchIfEmpty(Mono.error(new TeamServiceException("Team with given id doesn't exist")));
     }
 
     public Mono<GetTeamDto> findByName(String name) {
-        return teamRepository.findByName(name)
-                             .map(Team::toGetTeamDto)
-                             .switchIfEmpty(Mono.error(new TeamServiceException("Team with given name doesn't exist")));
+        return teamRepository
+            .findByName(name)
+            .map(Team::toGetTeamDto)
+            .switchIfEmpty(Mono.error(new TeamServiceException("Team with given name doesn't exist")));
     }
 
     public Mono<GetTeamDto> addTeam(Mono<CreateTeamDto> createTeamDtoMono) {

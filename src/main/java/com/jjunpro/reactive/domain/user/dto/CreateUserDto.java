@@ -3,6 +3,7 @@ package com.jjunpro.reactive.domain.user.dto;
 import com.jjunpro.reactive.domain.user.User;
 import com.jjunpro.reactive.domain.user.type.UserRole;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -26,7 +27,9 @@ public record CreateUserDto(
     @Size(min = 3, max = 10, message = "최소 3글자에서 최대 10글자까지만 입력 가능합니다.")
     String nickname,
 
+    @Pattern(regexp = "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,3}", message = "이메일 형식에 맞게 입력해주세요.")
     String email,
+
     String phone,
     LocalDateTime createdDate,
     LocalDateTime modifiedDate,

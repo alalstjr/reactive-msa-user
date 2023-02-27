@@ -23,8 +23,8 @@ import reactor.core.publisher.Mono;
  * @author jjunpro
  * @since 2023/02/25 AM 12:45
  */
-@Service
 @Slf4j
+@Service
 @RequiredArgsConstructor
 public class UserService {
 
@@ -38,7 +38,7 @@ public class UserService {
      * @return
      */
     public Flux<GetUserDto> findAllUsers() {
-        return this.userRepository
+        return userRepository
                 .findAll()
                 .flatMap(user -> Flux.just(user.toGetUserDto()));
     }
@@ -49,7 +49,7 @@ public class UserService {
      * @return
      */
     public Mono<GetUserDto> findById(String userId) {
-        return this.userRepository
+        return userRepository
                 .findById(userId)
                 .map(User::toGetUserDto)
                 .switchIfEmpty(Mono.error(new UserServiceException(HttpStatus.UNPROCESSABLE_ENTITY, "id doesn't exist")));
@@ -61,7 +61,7 @@ public class UserService {
      * @return
      */
     public Mono<GetUserDto> findByUsername(String username) {
-        return this.userRepository
+        return userRepository
                 .findByUsername(username)
                 .map(User::toGetUserDto)
                 .switchIfEmpty(Mono.error(new UserServiceException(HttpStatus.UNPROCESSABLE_ENTITY, "username doesn't exist")));
@@ -206,7 +206,7 @@ public class UserService {
     public Mono<String> login(Mono<LoginUserDto> loginUserDtoMono) {
         return loginUserDtoMono.flatMap(
             loginUserDto ->
-                this.userRepository
+                userRepository
                     .findByUsername(loginUserDto.username())
                     .map(User::toGetUserDto)
                     .filter(userDto -> passwordEncoder.matches(loginUserDto.password(), userDto.password()))

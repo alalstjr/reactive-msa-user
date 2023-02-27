@@ -1,8 +1,8 @@
 package com.jjunpro.reactive.web.handler;
 
 import com.jjunpro.reactive.application.service.UserService;
-import com.jjunpro.reactive.domain.team.dto.GetTeamDto;
 import com.jjunpro.reactive.domain.user.dto.CreateUserDto;
+import com.jjunpro.reactive.domain.user.dto.GetUserDto;
 import com.jjunpro.reactive.domain.user.dto.LoginUserDto;
 import com.jjunpro.reactive.web.config.GlobalRoutingHandler;
 import com.jjunpro.reactive.web.error.ObjectValidator;
@@ -26,7 +26,7 @@ public class UserHandlers {
         return ServerResponse
             .status(HttpStatus.OK)
             .contentType(MediaType.APPLICATION_JSON)
-            .body(userService.findAllUsers(), GetTeamDto.class);
+            .body(userService.findAllUsers(), GetUserDto.class);
     }
 
     public Mono<ServerResponse> findById(ServerRequest serverRequest) {
