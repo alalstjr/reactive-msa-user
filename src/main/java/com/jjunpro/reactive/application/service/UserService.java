@@ -212,7 +212,6 @@ public class UserService {
                     .filter(userDto -> passwordEncoder.matches(loginUserDto.password(), userDto.password()))
                     .map(jwtUtil::generateToken)
                     .switchIfEmpty(Mono.error(new UserServiceException(HttpStatus.UNAUTHORIZED, "로그인 정보가 옳바르지 않습니다.")))
-                    .log()
         );
     }
 }
