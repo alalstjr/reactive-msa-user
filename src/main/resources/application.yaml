@@ -6,6 +6,22 @@ server:
     include-message: always       # Response 에 Exception Message 를 표시할지 (never | always | on_param)
     include-stacktrace: on_param  # Response 에 Stack Trace 를 표시할지 (never | always | on_param) on_trace_params 은 deprecated
     whitelabel.enabled: true      # 에러 발생 시 Spring 기본 에러 페이지 노출 여부
+  netty:
+    worker:
+      # worker 스레드의 수 설정
+      # 기본값은 처리기 개수에 따라 동적으로 설정됩니다.
+      # 이 값을 설정하면 Netty가 고정된 개수의 스레드를 사용하게 됩니다.
+      count: 16
+    boss:
+      # boss 스레드의 수 설정
+      # 기본값은 1입니다.
+      count: 2
+    executor:
+      # executor 스레드의 수 설정
+      # 기본값은 Runtime.getRuntime().availableProcessors() * 2입니다.
+      count: 32
+#      # executor 스레드의 우선순위 설정
+#      priority: 8
 
 #logging:
 #  level:

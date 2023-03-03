@@ -12,7 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public record CreateUserDto(
 
     @NotNull(message = "아이디는 필수로 입력해야합니다.")
-    @Size(min = 3, max = 10, message = "최소 3글자에서 최대 10글자까지만 입력 가능합니다.")
+    @Size(min = 3, max = 20, message = "최소 3글자에서 최대 10글자까지만 입력 가능합니다.")
     String username,
 
     @NotNull(message = "비밀번호는 필수로 입력해야합니다.")
@@ -24,7 +24,7 @@ public record CreateUserDto(
     String passwordConfirmation,
 
     @NotNull(message = "닉네임은 필수로 입력해야합니다.")
-    @Size(min = 3, max = 10, message = "최소 3글자에서 최대 10글자까지만 입력 가능합니다.")
+    @Size(min = 3, max = 20, message = "최소 3글자에서 최대 10글자까지만 입력 가능합니다.")
     String nickname,
 
     @Pattern(regexp = "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,3}", message = "이메일 형식에 맞게 입력해주세요.")
