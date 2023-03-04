@@ -76,42 +76,14 @@ public class UserService {
 
         return createUserDtoMono
             .flatMap(createUserDto -> {
-                Mono<Boolean> usernameExistsMono       = checkIfUsernameExists(createUserDto.username());
-                Mono<Boolean> nicknameExistsMono       = checkIfNicknameExists(createUserDto.nickname());
-                Mono<Boolean> passwordConfirmationMono = checkIfPasswordConfirmation(
-                    createUserDto.password(), createUserDto.passwordConfirmation()
-                );
+                String username = createUserDto.username();
+                String nickname = createUserDto.nickname();
+                String password = createUserDto.password();
+                String passwordConfirmation = createUserDto.passwordConfirmation();
 
-                /* 유효성 검사를 실시합니다. */
-                return Mono.zip(usernameExistsMono, nicknameExistsMono, passwordConfirmationMono)
-                           .doOnEach(
-                               user -> log.info("회원 [" + createUserDto.username() + "] 을 추가 시도합니다.")
-                           )
-                           .flatMap(zip -> {
-                               Boolean usernameExists       = zip.getT1();
-                               Boolean nicknameExists       = zip.getT2();
-                               Boolean passwordConfirmation = zip.getT3();
-
-                               if (Boolean.TRUE.equals(usernameExists)) {
-                                   return Mono.error(
-                                       new UserServiceException(HttpStatus.UNPROCESSABLE_ENTITY, "아이디가 이미 존재합니다.")
-                                   );
-                               }
-
-                               if (Boolean.TRUE.equals(nicknameExists)) {
-                                   return Mono.error(
-                                       new UserServiceException(HttpStatus.UNPROCESSABLE_ENTITY, "닉네임이 이미 존재합니다.")
-                                   );
-                               }
-
-                               if (Boolean.FALSE.equals(passwordConfirmation)) {
-                                   return Mono.error(
-                                       new UserServiceException(HttpStatus.UNPROCESSABLE_ENTITY, "비밀번호가 일치하지 않습니다.")
-                                   );
-                               }
-
-                               return createUser(createUserDto);
-                           });
+                return validateInput(username, nickname, password, passwordConfirmation)
+                    .then(checkIfUserExists(username, nickname, password, passwordConfirmation))
+                    .then(createUser(createUserDto));
             });
     }
 
@@ -192,10 +164,11 @@ public class UserService {
      * @return
      */
     private Mono<GetUserDto> createUser(CreateUserDto createUserDto) {
-        var user = createUserDto.toUser(passwordEncoder);
-        return userRepository
+        var userMono = createUserDto.toUser(passwordEncoder);
+        return userMono.flatMap(user -> userRepository
             .save(user)
-            .map(User::toGetUserDto);
+            .map(User::toGetUserDto))
+            ;
     }
 
     /**
@@ -205,13 +178,87 @@ public class UserService {
      */
     public Mono<String> login(Mono<LoginUserDto> loginUserDtoMono) {
         return loginUserDtoMono.flatMap(
-            loginUserDto ->
-                userRepository
-                    .findByUsername(loginUserDto.username())
-                    .map(User::toGetUserDto)
-                    .filter(userDto -> passwordEncoder.matches(loginUserDto.password(), userDto.password()))
-                    .map(jwtUtil::generateToken)
-                    .switchIfEmpty(Mono.error(new UserServiceException(HttpStatus.UNAUTHORIZED, "로그인 정보가 옳바르지 않습니다.")))
+            loginUserDto -> {
+                String username = loginUserDto.username();
+                String password = loginUserDto.password();
+
+                if (isInvalid(username)) {
+                    return Mono.error(createException("아이디", "1글자 이상, 20글자 이하로 입력"));
+                }
+                if (isInvalid(password)) {
+                    return Mono.error(createException("비밀번호", "1글자 이상, 20글자 이하로 입력"));
+                }
+                else {
+                    return userRepository
+                        .findByUsername(loginUserDto.username())
+                        .map(User::toGetUserDto)
+                        .filter(userDto -> passwordEncoder.matches(loginUserDto.password(), userDto.password()))
+                        .flatMap(jwtUtil::generateToken)
+                        .switchIfEmpty(Mono.error(new UserServiceException(HttpStatus.UNAUTHORIZED, "로그인 정보가 옳바르지 않습니다.")));
+                }
+            }
         );
+    }
+
+    private boolean isInvalid(String value) {
+        return value == null || value.trim().length() < 3 || value.trim().length() > 20;
+    }
+
+    private UserServiceException createException(String fieldName, String message) {
+        return new UserServiceException(HttpStatus.UNPROCESSABLE_ENTITY, fieldName + "은(는) " + message + "해야합니다.");
+    }
+
+    private Mono<Void> validateInput(String username, String nickname, String password, String passwordConfirmation) {
+        if (isInvalid(username)) {
+            return Mono.error(createException("아이디", "2글자 이상, 20글자 이하로 입력"));
+        }
+        if (isInvalid(nickname)) {
+            return Mono.error(createException("닉네임", "2글자 이상, 20글자 이하로 입력"));
+        }
+        if (isInvalid(password)) {
+            return Mono.error(createException("비밀번호", "3글자 이상, 20글자 이하로 입력"));
+        }
+        if (isInvalid(passwordConfirmation)) {
+            return Mono.error(createException("확인 비밀번호", "3글자 이상, 20글자 이하로 입력"));
+        }
+        if (!password.equals(passwordConfirmation)) {
+            return Mono.error(new UserServiceException(HttpStatus.UNPROCESSABLE_ENTITY, "비밀번호와 확인 비밀번호가 일치하지 않습니다."));
+        }
+        return Mono.empty();
+    }
+
+    private Mono<Void> checkIfUserExists(String username, String nickname, String password, String passwordConfirmation) {
+        Mono<Boolean> usernameExistsMono       = checkIfUsernameExists(username);
+        Mono<Boolean> nicknameExistsMono       = checkIfNicknameExists(nickname);
+        Mono<Boolean> passwordConfirmationMono = checkIfPasswordConfirmation(password, passwordConfirmation);
+
+        /* 유효성 검사를 실시합니다. */
+        return Mono.zip(usernameExistsMono, nicknameExistsMono, passwordConfirmationMono)
+                   .doOnEach(user -> log.info("회원 [" + username + "] 을 추가 시도합니다."))
+                   .flatMap(zip -> {
+                       Boolean usernameExists             = zip.getT1();
+                       Boolean nicknameExists             = zip.getT2();
+                       Boolean passwordConfirmationExists = zip.getT3();
+
+                       if (Boolean.TRUE.equals(usernameExists)) {
+                           return Mono.error(
+                               new UserServiceException(HttpStatus.UNPROCESSABLE_ENTITY, "아이디가 이미 존재합니다.")
+                           );
+                       }
+
+                       if (Boolean.TRUE.equals(nicknameExists)) {
+                           return Mono.error(
+                               new UserServiceException(HttpStatus.UNPROCESSABLE_ENTITY, "닉네임이 이미 존재합니다.")
+                           );
+                       }
+
+                       if (Boolean.FALSE.equals(passwordConfirmationExists)) {
+                           return Mono.error(
+                               new UserServiceException(HttpStatus.UNPROCESSABLE_ENTITY, "비밀번호가 일치하지 않습니다.")
+                           );
+                       }
+
+                       return Mono.empty();
+                   });
     }
 }

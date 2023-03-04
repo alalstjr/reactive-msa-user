@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
+import reactor.core.publisher.Mono;
 
 @Builder
 @EqualsAndHashCode
@@ -54,5 +55,9 @@ public class User {
 
     public GetUserDto toGetUserDto() {
         return new GetUserDto(id, username, nickname, password, userRoles, teamId, createdDate);
+    }
+
+    public Mono<GetUserDto> toGetUserDtoMono() {
+        return Mono.fromCallable(() -> new GetUserDto(id, username, nickname, password, userRoles, teamId, createdDate));
     }
 }

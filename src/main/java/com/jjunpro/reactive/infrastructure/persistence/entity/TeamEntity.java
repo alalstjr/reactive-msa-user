@@ -26,7 +26,7 @@ public class TeamEntity {
         return Team.builder()
                    .id(id)
                    .name(name)
-                   .members(members.stream().map(UserEntity::toUser).toList())
+//                   .members(members.stream().map(UserEntity::toUser).toList())
                    .build();
     }
 }

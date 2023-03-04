@@ -48,8 +48,8 @@ public class SecurityConfig {
             .pathMatchers(HttpMethod.OPTIONS).permitAll()
             .pathMatchers("/login").permitAll()
             .pathMatchers(HttpMethod.POST, "/users").permitAll()
+            .pathMatchers(HttpMethod.GET, "/users/**").permitAll()
             // 로그인이 필요한 경로 설정
-            .pathMatchers(HttpMethod.GET, "/users").authenticated()
             // 권한이 필요한 경로 설정
             .pathMatchers(HttpMethod.DELETE, "/users/**").hasRole("USER")
             .anyExchange().authenticated()

@@ -6,11 +6,14 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import java.security.Key;
+import java.time.Instant;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 /**
  * JWToken 전체적인 설정 정보
@@ -33,46 +36,48 @@ public class JWTUtil {
         this.key = Keys.hmacShaKeyFor(secret.getBytes());
     }
 
-    public Claims getAllClaimsFromToken(String token) {
-        return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
+    public Mono<Claims> getAllClaimsFromToken(String token) {
+        return Mono.fromCallable(() -> Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody()).subscribeOn(Schedulers.boundedElastic());
     }
 
-    public String getUsernameFromToken(String token) {
-        return getAllClaimsFromToken(token).getSubject();
+    public Mono<String> getUsernameFromToken(String token) {
+        return getAllClaimsFromToken(token).map(Claims::getSubject);
     }
 
-    public Date getExpirationDateFromToken(String token) {
-        return getAllClaimsFromToken(token).getExpiration();
+    public Mono<Date> getExpirationDateFromToken(String token) {
+        return getAllClaimsFromToken(token).map(Claims::getExpiration);
     }
 
-    private Boolean isTokenExpired(String token) {
-        final Date expiration = getExpirationDateFromToken(token);
-        return expiration.before(new Date());
+    private Mono<Boolean> isTokenExpired(String token) {
+        return getExpirationDateFromToken(token).map(expiration -> expiration.toInstant().isBefore(Instant.now()));
     }
 
-    public String generateToken(GetUserDto user) {
+    public Mono<String> generateToken(GetUserDto user) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("role", user.userRoles());
         claims.put("_id", user.id());
         return doGenerateToken(claims, user.username());
     }
 
-    private String doGenerateToken(Map<String, Object> claims, String username) {
+    private Mono<String> doGenerateToken(Map<String, Object> claims, String username) {
         long       expirationTimeLong = Long.parseLong(expirationTime); //in second
         final Date createdDate        = new Date();
         final Date expirationDate     = new Date(createdDate.getTime() + expirationTimeLong * 1000);
 
-        return Jwts
-            .builder()
-            .setClaims(claims)
-            .setSubject(username)
-            .setIssuedAt(createdDate)
-            .setExpiration(expirationDate)
-            .signWith(key)
-            .compact();
+        return Mono.fromCallable(
+                       () ->
+                           Jwts.builder()
+                           .setClaims(claims)
+                           .setSubject(username)
+                           .setIssuedAt(createdDate)
+                           .setExpiration(expirationDate)
+                           .signWith(key)
+                           .compact()
+               )
+               .subscribeOn(Schedulers.boundedElastic());
     }
 
-    public Boolean validateToken(String token) {
-        return !isTokenExpired(token);
+    public Mono<Boolean> validateToken(String token) {
+        return isTokenExpired(token).map(expired -> !expired);
     }
 }

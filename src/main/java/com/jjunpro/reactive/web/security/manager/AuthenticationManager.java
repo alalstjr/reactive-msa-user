@@ -1,7 +1,6 @@
 package com.jjunpro.reactive.web.security.manager;
 
 import com.jjunpro.reactive.web.security.util.JWTUtil;
-import io.jsonwebtoken.Claims;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
@@ -25,23 +24,23 @@ public class AuthenticationManager implements ReactiveAuthenticationManager {
     @Override
     @SuppressWarnings("unchecked")
     public Mono<Authentication> authenticate(Authentication authentication) {
-        String authToken = authentication.getCredentials().toString();
-        String username = jwtUtil.getUsernameFromToken(authToken);
+        String       authToken = authentication.getCredentials().toString();
+        Mono<String> username  = jwtUtil.getUsernameFromToken(authToken);
 
-        return Mono
-            .just(jwtUtil.validateToken(authToken))
-            .filter(valid -> valid)
-            .switchIfEmpty(Mono.empty())
-            .map(
-                valid -> {
-                    Claims       claims   = jwtUtil.getAllClaimsFromToken(authToken);
-                    List<String> rolesMap = claims.get("role", List.class);
-                    return new UsernamePasswordAuthenticationToken(
-                        username,
-                        null,
-                        rolesMap.stream().map(SimpleGrantedAuthority::new).toList()
-                    );
-                }
-            );
+        return jwtUtil.validateToken(authToken)
+                      .flatMap(valid -> {
+                          if (Boolean.FALSE.equals(valid)) {
+                              return Mono.empty();
+                          }
+                          return jwtUtil.getAllClaimsFromToken(authToken)
+                                        .map(claims -> {
+                                            List<String> rolesMap = claims.get("role", List.class);
+                                            return new UsernamePasswordAuthenticationToken(
+                                                username,
+                                                null,
+                                                rolesMap.stream().map(SimpleGrantedAuthority::new).toList()
+                                            );
+                                        });
+                      });
     }
 }

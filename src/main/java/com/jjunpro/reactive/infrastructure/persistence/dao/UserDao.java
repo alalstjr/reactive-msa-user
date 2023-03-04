@@ -11,5 +11,5 @@ public interface UserDao extends ReactiveMongoRepository<UserEntity, String> {
 
     Mono<UserEntity> findByUsername(String username);
 
-    Mono<UserEntity> findByNickname(String email);
+    Mono<UserEntity> findByNickname(String nickname);
 }

@@ -5,7 +5,6 @@ import com.jjunpro.reactive.domain.user.dto.CreateUserDto;
 import com.jjunpro.reactive.domain.user.dto.GetUserDto;
 import com.jjunpro.reactive.domain.user.dto.LoginUserDto;
 import com.jjunpro.reactive.web.config.GlobalRoutingHandler;
-import com.jjunpro.reactive.web.error.ObjectValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -19,7 +18,6 @@ import reactor.core.publisher.Mono;
 public class UserHandlers {
 
     private final UserService     userService;
-    private final ObjectValidator validator;
 
     public Mono<ServerResponse> findAllUsers(ServerRequest serverRequest) {
         serverRequest.headers();
@@ -40,7 +38,7 @@ public class UserHandlers {
     }
 
     public Mono<ServerResponse> createUser(ServerRequest serverRequest) {
-        var createUserDtoMono = serverRequest.bodyToMono(CreateUserDto.class).doOnNext(validator::validate);
+        var createUserDtoMono = serverRequest.bodyToMono(CreateUserDto.class);
         return GlobalRoutingHandler.doRequest(userService.addUser(createUserDtoMono), HttpStatus.CREATED);
     }
 
@@ -50,7 +48,7 @@ public class UserHandlers {
     }
 
     public Mono<ServerResponse> login(ServerRequest serverRequest) {
-        var loginUserDtoMono = serverRequest.bodyToMono(LoginUserDto.class).doOnNext(validator::validate);
+        var loginUserDtoMono = serverRequest.bodyToMono(LoginUserDto.class);
         return GlobalRoutingHandler.doRequest(userService.login(loginUserDtoMono), HttpStatus.CREATED);
     }
 }

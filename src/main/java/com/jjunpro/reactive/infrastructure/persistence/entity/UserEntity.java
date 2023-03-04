@@ -14,6 +14,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import reactor.core.publisher.Mono;
 
 @Getter
 @Builder
@@ -35,8 +36,8 @@ public class UserEntity implements UserDetails {
     private LocalDateTime  modifiedDate;
     private Boolean        enabled;
 
-    public User toUser() {
-        return User
+    public Mono<User> toUser() {
+        return Mono.fromCallable(() -> User
             .builder()
             .id(id)
             .username(username)
@@ -48,7 +49,7 @@ public class UserEntity implements UserDetails {
             .teamId(teamId)
             .createdDate(createdDate)
             .modifiedDate(modifiedDate)
-            .build();
+            .build());
     }
 
     @Override
