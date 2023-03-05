@@ -130,7 +130,7 @@ public class UserService {
     private Mono<Boolean> checkIfUsernameExists(String username) {
         return userRepository
             .findByUsername(username)
-            .map(user -> true) // username 이 이미 존재하는 경우
+            .flatMap(user -> Mono.just(Boolean.TRUE)) // username 이 이미 존재하는 경우
             .defaultIfEmpty(false); // username 이 존재하지 않는 경우
     }
 
@@ -142,7 +142,7 @@ public class UserService {
     private Mono<Boolean> checkIfNicknameExists(String nickname) {
         return userRepository
             .findByNickname(nickname)
-            .map(user -> true) // nickname 가 이미 존재하는 경우
+            .flatMap(user -> Mono.just(Boolean.TRUE)) // nickname 가 이미 존재하는 경우
             .defaultIfEmpty(false); // nickname 가 존재하지 않는 경우
     }
 
@@ -234,7 +234,6 @@ public class UserService {
 
         /* 유효성 검사를 실시합니다. */
         return Mono.zip(usernameExistsMono, nicknameExistsMono, passwordConfirmationMono)
-                   .doOnEach(user -> log.info("회원 [" + username + "] 을 추가 시도합니다."))
                    .flatMap(zip -> {
                        Boolean usernameExists             = zip.getT1();
                        Boolean nicknameExists             = zip.getT2();
