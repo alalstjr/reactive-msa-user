@@ -1,4 +1,4 @@
-FROM openjdk:17
-EXPOSE 8080
-ADD target/app.jar app.jar
-ENTRYPOINT ["java","-jar","app.jar"]
+FROM openjdk:17-alpine
+ARG JAR_FILE=./build/libs/*.jar
+COPY ${JAR_FILE} app.jar
+ENTRYPOINT ["java", "-XX:+AllowRedefinitionToAddDeleteMethods","-jar","/app.jar"]
