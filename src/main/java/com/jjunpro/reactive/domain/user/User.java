@@ -3,7 +3,6 @@ package com.jjunpro.reactive.domain.user;
 import com.jjunpro.reactive.domain.user.dto.GetUserDto;
 import com.jjunpro.reactive.domain.user.type.UserRole;
 import com.jjunpro.reactive.infrastructure.persistence.entity.UserEntity;
-import java.time.LocalDateTime;
 import java.util.List;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -22,8 +21,8 @@ public class User {
     List<UserRole> userRoles;
     String         teamId;
     Boolean        enabled;
-    LocalDateTime  createdDate;
-    LocalDateTime  modifiedDate;
+    String  createdDate;
+    String  modifiedDate;
 
     public User withTeamId(String newTeamId) {
         return User

@@ -24,6 +24,9 @@ spring:
       database: mongodb_tutorial
       username: root
       password: root
+    redis:
+      host: localhost
+      port: 6379
 
 #logging:
 #  level:

@@ -2,7 +2,6 @@ package com.jjunpro.reactive.infrastructure.persistence.entity;
 
 import com.jjunpro.reactive.domain.user.User;
 import com.jjunpro.reactive.domain.user.type.UserRole;
-import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -32,8 +31,8 @@ public class UserEntity implements UserDetails {
     private String         phone;
     private List<UserRole> userRoles;
     private String         teamId;
-    private LocalDateTime  createdDate;
-    private LocalDateTime  modifiedDate;
+    private String  createdDate;
+    private String  modifiedDate;
     private Boolean        enabled;
 
     public Mono<User> toUser() {

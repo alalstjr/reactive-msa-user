@@ -27,7 +27,7 @@ public record CreateUserDto(
             .nickname(nickname)
             .password(encodedPassword)
             .userRoles(List.of(UserRole.ROLE_USER))
-            .createdDate(LocalDateTime.now())
+            .createdDate(LocalDateTime.now().toString())
             .build()));
     }
 }

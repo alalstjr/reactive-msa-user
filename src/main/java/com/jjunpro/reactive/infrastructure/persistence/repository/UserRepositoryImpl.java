@@ -23,6 +23,7 @@ import reactor.core.publisher.Mono;
 public class UserRepositoryImpl implements UserRepository {
 
     private final UserDao userDao;
+    private final UserCacheRepositoryImpl userCacheRepository;
 
     @Override
     public Flux<User> findAll() {
@@ -38,11 +39,21 @@ public class UserRepositoryImpl implements UserRepository {
             .flatMap(UserEntity::toUser);
     }
 
+//    @Override
+//    public Mono<User> findById(String id) {
+//        return userDao
+//            .findById(id)
+//            .flatMap(UserEntity::toUser)
+//            ;
+//    }
+
     @Override
     public Mono<User> findById(String id) {
-        return userDao
-            .findById(id)
-            .flatMap(UserEntity::toUser)
+        return this.userCacheRepository.findById(id)
+            .switchIfEmpty(
+                userDao.findById(id).flatMap(UserEntity::toUser)
+                       .flatMap(userCacheRepository::save)
+            )
             ;
     }
 
@@ -50,7 +61,9 @@ public class UserRepositoryImpl implements UserRepository {
     public Mono<User> save(User user) {
         return userDao
             .save(user.toEntity())
-            .flatMap(UserEntity::toUser);
+            .flatMap(UserEntity::toUser)
+            .flatMap(userCacheRepository::save)
+            ;
     }
 
 
